@@ -79,6 +79,7 @@ namespace Pi_Custom_Assembler
             string[] justUseALibrary = file.Split('.');
             for (int i = 0; i < justUseALibrary.Length - 1; i++)
             {
+                //TODO fix this not working with folders with . in their names
                 outputName += justUseALibrary[i];
             }
             outputName += ".img";
@@ -89,6 +90,11 @@ namespace Pi_Custom_Assembler
 
         private static string LineToWord(string s)
         {
+            if (!char.IsLetter(s[0]))
+            {
+                Console.WriteLine("skipped comment " + s);
+                return "";
+            }
             List<string> tokens = new List<string>();
             foreach (Match m in Regex.Matches(s, "\\w+")) tokens.Add(m.Value);
             var (Instruc, Cond) = AppropriateInstruction(tokens[0]);
@@ -168,6 +174,10 @@ namespace Pi_Custom_Assembler
                         ISuckAtThis.Append("101");
                         ISuckAtThis.Flag(flags, "L");
                         ISuckAtThis.Append(GetImmediate(tokens[1], 24));
+                        break;
+                    case Instruction.BX:
+                        ISuckAtThis.Append("000100101111111111110001");
+                        ISuckAtThis.Append(GetRegister(tokens[1]));
                         break;
                 }
             }
